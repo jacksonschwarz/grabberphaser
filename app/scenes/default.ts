@@ -81,6 +81,13 @@ class TestScene extends Phaser.Scene {
   //declare variable of camera
   bg;
 
+  //the current color of the 
+  colorIndex:number=0;
+  //list of colors per letter
+  colorProgression=[
+    "rgb(27,146,156)","rgb(44,205,244)","rgb(54,3,110)","rgb(234,248,46)","rgb(51,143,99)","rgb(212,166,120)","rgb(218,226,177)","rgb(148,7,179)","rgb(106,42,15)","rgb(64,125,93)"
+  ]
+
 
   /**
    * Creates the token objects, adds colliders between the player and the tokens. 
@@ -227,7 +234,7 @@ class TestScene extends Phaser.Scene {
     this.numberOfTokens=5;
     this.tokenScale=1.5;
     this.gameStarted=false;
-    
+    this.colorIndex=0;
     // this.createTokens(player)
     this.createObstacle(player, this.velocity);
 
@@ -250,7 +257,11 @@ class TestScene extends Phaser.Scene {
       this.tokenScale-=tokenScaleDelta;      
     }
 
-    this.bg.setBackgroundColor(this.randomColor());
+    this.bg.setBackgroundColor(this.colorProgression[this.colorIndex]);
+    if(this.colorIndex < this.colorProgression.length){
+
+    }
+    this.colorIndex++;
     this.createTokens(player)
     this.updateObstacles(this.velocity, this.obstacleScale)
     this.updateTokens(this.tokenScale)
