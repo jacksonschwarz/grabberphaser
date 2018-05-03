@@ -78,6 +78,9 @@ class TestScene extends Phaser.Scene {
   //declare variable for spacebar
   keySpace;
 
+  //declare variable of camera
+  bg;
+
 
   /**
    * Creates the token objects, adds colliders between the player and the tokens. 
@@ -229,6 +232,8 @@ class TestScene extends Phaser.Scene {
     this.createObstacle(player, this.velocity);
 
     this.startIntstructionText.setText("Press SPACEBAR to start the game")
+    this.bg.setBackgroundColor("black");
+    this.scoreText.setText("Score: 0");
     
   }
   /**
@@ -244,14 +249,25 @@ class TestScene extends Phaser.Scene {
     if(this.tokenScale > this.tokenScaleLimit){
       this.tokenScale-=tokenScaleDelta;      
     }
+
+    this.bg.setBackgroundColor(this.randomColor());
     this.createTokens(player)
     this.updateObstacles(this.velocity, this.obstacleScale)
     this.updateTokens(this.tokenScale)
+  }
+  randomColor=()=>{
+    let r=Phaser.Math.Between(0, 255);
+    let g=Phaser.Math.Between(0, 255);
+    let b=Phaser.Math.Between(0, 255);
+    return "rgb("+r+","+g+","+b+")"
   }
   /**
    * Phaser create function
    */
   create(){
+    this.bg=this.cameras.add(0, 0, 800, 800, true);
+    this.bg.setBackgroundColor("black")
+
     let player=this.physics.add.sprite(400, 250, "player");
     player.setBounce(-1);
     player.body["allowGravity"]=false
