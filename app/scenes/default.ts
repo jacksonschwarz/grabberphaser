@@ -1,4 +1,3 @@
-
 class TestScene extends Phaser.Scene {
 
   constructor(){
@@ -16,7 +15,7 @@ class TestScene extends Phaser.Scene {
   onLoadProgress(progress) {
     this.progressBar
       .clear()
-      .fillStyle(0xffffff, 0.75)
+      .fillStyle("white", 0.75)
       .fillRect(0, 0, 800 * progress, 50);
     console.log('progress', progress);
   }
@@ -27,6 +26,7 @@ class TestScene extends Phaser.Scene {
     this.load.audio("getToken", "sounds/pling.ogg", null, null);
     this.load.audio("death", "sounds/death2.ogg", null, null);
     this.load.image("resetButton", "resetbutton.png");
+    this.load.image("gameover", "game_over.png");
     this.progressBar=this.add.graphics({})
     this.load.on('progress', this.onLoadProgress, this);
     this.load.on('complete', this.onLoadComplete, this);
@@ -59,6 +59,17 @@ class TestScene extends Phaser.Scene {
   //An array of sprites for updating and deleting tokens
   tokenGroup=[];
 
+
+  //How much each new level adds/subtracts to the velocity, token scales, and obstacle scale 
+  velocityDelta:number=25;
+  tokenScaleDelta:number=0.1;
+  obstacleScaleDelta:number=0.1
+
+  //The limits of velocity, token scale, and obstacle 
+  velocityLimit:number=400;
+  tokenScaleLimit:number=0.5;
+  obstacleScaleLimit:number=4;
+
   //if the game has not started, this is false
   gameStarted:boolean;
   //is the "Press SPACEBAR to begin" text
@@ -66,6 +77,8 @@ class TestScene extends Phaser.Scene {
 
   //declare variable for spacebar
   keySpace;
+
+
   /**
    * Creates the token objects, adds colliders between the player and the tokens. 
    */
@@ -140,7 +153,7 @@ class TestScene extends Phaser.Scene {
     this.score++;
     this.scoreText.setText("Score : "+this.score)
     if(this.score % this.numberOfTokens == 0){
-      this.nextLevel(player, 0.1, 25, 0.1)
+      this.nextLevel(player, this.obstacleScaleDelta, this.velocityDelta, this.tokenScaleDelta)
     }
     console.log("collected!");
   }
@@ -152,18 +165,12 @@ class TestScene extends Phaser.Scene {
     let deathSound=this.sound.add("death")
     deathSound.play()
     console.log("HIT!")
-    let gameOverText= this.add.text(
-      0, 
-      0, 
-      "GAME OVER!", 
-      { 
-        fontFamily: 'Arial', 
-        fontSize: 45, color: 'white' 
-      })
+    let gameOverText= this.add.image(190, 35, "gameover");
     // this.createButton(player)
     for(let i=0;i<this.obstacleGroup.length;i++){
       this.obstacleGroup[i].disableBody(true, true);
     }
+    
 
     for(let i=0;i<this.tokenGroup.length;i++){
       this.tokenGroup[i].disableBody(true, true);
@@ -192,7 +199,7 @@ class TestScene extends Phaser.Scene {
     })
     container.on("pointerup", ()=>{
       this.resetGame(player)
-      gameOverText.setText("")
+      gameOverText.destroy()
       resetButton.destroy()
     })
   }
@@ -228,13 +235,13 @@ class TestScene extends Phaser.Scene {
    * Updates the tokens and obstacles 
    */
   nextLevel=(player, obstacleScaleDelta, obstacleVelocityDelta, tokenScaleDelta)=>{
-    if(this.velocity < 250){
+    if(this.velocity < this.velocityLimit){
       this.velocity+=obstacleVelocityDelta 
     }
-    if(this.obstacleScale < 3){
+    if(this.obstacleScale < this.obstacleScaleLimit){
       this.obstacleScale+=obstacleScaleDelta; 
     }
-    if(this.tokenScale > 0.5){
+    if(this.tokenScale > this.tokenScaleLimit){
       this.tokenScale-=tokenScaleDelta;      
     }
     this.createTokens(player)
@@ -242,7 +249,7 @@ class TestScene extends Phaser.Scene {
     this.updateTokens(this.tokenScale)
   }
   /**
-   * Phaser create functio 
+   * Phaser create function
    */
   create(){
     let player=this.physics.add.sprite(400, 250, "player");

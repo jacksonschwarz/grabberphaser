@@ -33,9 +33,9 @@ const game = new Phaser.Game(<any>{ // <any> works around the missing GameConfig
   //   forceSetTimeout: false,
   // },
   // pixelArt: false,
-  // transparent: false,
+  transparent: false,
   // clearBeforeRender: true,
-  // backgroundColor: 0x000000, // black
+  backgroundColor: 0x000000, // black
   loader: {
     // baseURL: '',
     path: 'assets/',
