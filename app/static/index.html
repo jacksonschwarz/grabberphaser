@@ -3,8 +3,34 @@
 <meta name='viewport' content='initial-scale=1.0, user-scalable=no'>
 <title>My Phaser 3 Game</title>
 <style>
-html, body { height: 100%; }
-body { margin: 0; padding: 0; color: #eee; }
+body, html {
+    margin: 0;
+    overflow: hidden;
+    background-color: rgba(56, 169, 197, 1);
+    height: 100%;
+  }
+  
+  #content {
+    -webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+  }
+  
 </style>
+<html>
+    <body>
+        <div id="content"></div>
+    </body>
+</html>
 <script defer src='vendor.js'></script>
 <script defer src='app.js'></script>

@@ -10,7 +10,7 @@ class Main extends Phaser.Scene{
     preload=()=>{
         this.load.image("startButton", "start.png")
         this.load.image("title", "title.png")
-        this.scene.add("menu", Menu, false)
+        // this.scene.add("menu", Menu, false)
         this.scene.add("TestScene", TestScene, false)
     }
     create=()=>{

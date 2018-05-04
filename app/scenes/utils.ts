@@ -6,14 +6,13 @@ export class Button{
     resourceImage:any;
     hoverTint:number | string;
     onClick:()=>void;
-    constructor(targetScene:any, x:number, y:number, resourceKey:string, hoverTint:number | string, onClick:()=>void){
-        this.targetScene=targetScene;
-        this.x=x;
-        this.y=y;
-        this.resourceKey=resourceKey;
-        this.hoverTint=hoverTint;
+    constructor(aTargetScene:any, anX:number, aY:number, aResourceKey:string, aHoverTint:number | string, onClick:()=>void){
+        this.targetScene=aTargetScene;
+        this.x=anX;
+        this.y=aY;
+        this.resourceKey=aResourceKey;
+        this.hoverTint=aHoverTint;
         this.onClick=onClick;
-        console.log(targetScene)
     }
     render=()=>{
         let container=this.targetScene.add.container(90, 550);
@@ -32,6 +31,11 @@ export class Button{
         })
     }
     destroy=()=>{
+        this.targetScene=null;
+        this.x=null;
+        this.y=null;
+        this.resourceKey=null;
+        this.hoverTint=null;
         this.resourceImage.destroy()
     }
 }
@@ -40,12 +44,16 @@ class ScaleManager {
     mobile:boolean;
     game;
     constructor(game, isMobile) {
+        console.log(game)
+        console.log(game.canvas);
         this.canvas = game.canvas;
         this.mobile = isMobile;
         this.game = game
 
         window.addEventListener('resize', () => {
             this.rescale();
+            // this.canvas.height=window.outerHeight;
+            // this.canvas.width=window.outerWidth;
             if (this.mobile) {
                 if (window.innerWidth < window.innerHeight) {
                     this.leaveIncorrectOrientation();
@@ -62,7 +70,7 @@ class ScaleManager {
         this.game.resize(width, height);
         this.game.scene.scenes.forEach(function (scene) {
             scene.cameras.main.setViewport(0, 0, width, height);
-            scene.cameras.main.setZoom(scale);
+            scene.cameras.main.setZoom(this.scale);
         });
         this.rescale();
     }

@@ -318,7 +318,7 @@ export class TestScene extends Phaser.Scene {
    * Phaser create function
    */
   create(){
-    this.bg=this.cameras.add(0, 0, 800, 800, true);
+    this.bg=this.cameras.add(0, 0, 800, 600, true);
     this.bg.setBackgroundColor("black")
 
     let player=this.physics.add.sprite(400, 250, "player");
