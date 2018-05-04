@@ -1,4 +1,5 @@
-class TestScene extends Phaser.Scene {
+import {Button} from "./utils";
+export class TestScene extends Phaser.Scene {
 
   constructor(){
       super({
@@ -73,7 +74,7 @@ class TestScene extends Phaser.Scene {
   //if the game has not started, this is false
   gameStarted:boolean;
   //is the "Press SPACEBAR to begin" text
-  startIntstructionText;
+  startInstructionText;
 
   //declare variable for spacebar
   keySpace;
@@ -81,6 +82,9 @@ class TestScene extends Phaser.Scene {
   //declare variable of camera
   bg;
 
+  //declare timer
+  timer;
+  timerText;
   //the current color of the 
   colorIndex:number=0;
   //list of colors per letter
@@ -197,21 +201,38 @@ class TestScene extends Phaser.Scene {
     this.tokenScale=1.5;
     
     //create button
-    let container=this.add.container(90, 550);
-    container.setInteractive(new Phaser.Geom.Circle(0, 0, 60), Phaser.Geom.Circle.Contains);
-    let resetButton=this.add.sprite(0, 0, "resetButton")
-    container.add(resetButton);
-    container.on("pointerover", function(){
-      resetButton.setTint(0x3366CC);
-    })
-    container.on("pointerout", function(){
-      resetButton.clearTint();
-    })
-    container.on("pointerup", ()=>{
-      this.resetGame(player)
-      gameOverText.destroy()
-      resetButton.destroy()
-    })
+    // let container=this.add.container(90, 550);
+    // container.setInteractive(new Phaser.Geom.Circle(0, 0, 60), Phaser.Geom.Circle.Contains);
+    // let resetButton=this.add.sprite(0, 0, "resetButton")
+    // container.add(resetButton);
+    // container.on("pointerover", function(){
+    //   resetButton.setTint(0x3366CC);
+    // })
+    // container.on("pointerout", function(){
+    //   resetButton.clearTint();
+    // })
+    // container.on("pointerup", ()=>{
+    //   this.resetGame(player)
+    //   gameOverText.destroy()
+    //   resetButton.destroy()
+    // })
+    let resetButton=new Button(
+      this,
+      90,
+      550,
+      "resetButton",
+      0x3366CC,
+      ()=>{
+        this.resetGame(player)
+        gameOverText.destroy()
+        resetButton.destroy()
+        this.timer=this.time.addEvent({
+          delay:3000,
+          callback:this.startGame
+        })
+      }
+    )
+    resetButton.render()
   }
   /**
    * Resets the game states for all of the game objects. It creates new obstacles
@@ -238,10 +259,22 @@ class TestScene extends Phaser.Scene {
     // this.createTokens(player)
     this.createObstacle(player, this.velocity);
 
-    this.startIntstructionText.setText("Press SPACEBAR to start the game")
+    // this.startInstructionText.setText("Press SPACEBAR to start the game")
     this.bg.setBackgroundColor("black");
     this.scoreText.setText("Score: 0");
     
+  }
+  /**
+   * Starts the game
+   */
+  startGame=()=>{
+    this.gameStarted=!this.gameStarted
+    this.updateObstacles(this.velocity, this.obstacleScale);
+    for(let i=0;i<this.obstacleGroup.length;i++){
+      this.physics.add.collider(this.obstacleGroup[i], this.player, this.hitByObstacle, null, null);
+    }
+    this.createTokens(this.player);
+    this.startInstructionText.setText("");
   }
   /**
    * Updates the tokens and obstacles 
@@ -258,13 +291,22 @@ class TestScene extends Phaser.Scene {
     }
 
     this.bg.setBackgroundColor(this.colorProgression[this.colorIndex]);
-    if(this.colorIndex < this.colorProgression.length){
-
+    if(this.colorIndex < this.colorProgression.length-1){
+      this.colorIndex++;
     }
-    this.colorIndex++;
+    else{
+      this.colorIndex=0;
+    }
     this.createTokens(player)
     this.updateObstacles(this.velocity, this.obstacleScale)
     this.updateTokens(this.tokenScale)
+  }
+    /**
+   * Moves player to pointer's position
+   */
+  movePlayer=(pointer)=>{
+    this.player.setX(pointer.x);
+    this.player.setY(pointer.y);
   }
   randomColor=()=>{
     let r=Phaser.Math.Between(0, 255);
@@ -284,10 +326,10 @@ class TestScene extends Phaser.Scene {
     player.body["allowGravity"]=false
     this.player=player;
     
-    this.startIntstructionText=this.add.text(
+    this.startInstructionText=this.add.text(
       0,
       0,
-      "Press SPACEBAR to start the game",
+      "1000",
       {
         fontFamily: "Arial",
         fontSize:30,
@@ -307,29 +349,28 @@ class TestScene extends Phaser.Scene {
         fontSize: 45, color: 'white' 
       })
 
-    this.input.on("pointermove", function(pointer){
-      player.setX(pointer.x);
-      player.setY(pointer.y);
+    this.timer=this.time.addEvent({
+      delay:3000,
+      callback:this.startGame
     })
-    this.keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    this.input.on("pointermove", this.movePlayer)
   }
+
 
   /**
    * Phaser update function
    */
   update(){
-    if(this.keySpace.isDown){
-     if(!this.gameStarted){
-        this.gameStarted=!this.gameStarted
-        this.updateObstacles(this.velocity, this.obstacleScale);
-        for(let i=0;i<this.obstacleGroup.length;i++){
-          this.physics.add.collider(this.obstacleGroup[i], this.player, this.hitByObstacle, null, null);
-        }
-        this.createTokens(this.player);
-        this.startIntstructionText.setText("");
-      }
+    if(this.timer.running){
+      console.log(this.timer.delay);
+      this.timerText.setText(this.timer.delay)
     }
+    // if(!this.gameStarted && this.keySpace.isDown){
+    //   this.startGame();
+    // }
+  }
+  render(){
+
   }
 
 }
-export default TestScene;
